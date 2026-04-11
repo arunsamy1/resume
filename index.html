@@ -1,0 +1,1273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-bg:   #0f1f38;
+      --sidebar-hover:#162d52;
+      --accent:       #38bdf8;
+      --accent2:      #34d399;
+      --tag-bg:       #1e3a5f;
+      --content-bg:   #f0f4f8;
+      --card-bg:      #ffffff;
+      --text-dark:    #1e2d3d;
+      --text-mid:     #475569;
+      --text-light:   #94a3b8;
+      --border:       #e2e8f0;
+      --heading-font: 'Poppins', sans-serif;
+      --body-font:    'Inter', sans-serif;
+      --sidebar-w:    320px;
+    }
+
+    html { scroll-behavior: smooth; font-size: 18px; }
+
+    body {
+      font-family: var(--body-font);
+      background: var(--content-bg);
+      color: var(--text-dark);
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ── HAMBURGER ── */
+    #hamburger {
+      position: fixed;
+      top: 20px;
+      left: calc(var(--sidebar-w) - 48px);
+      z-index: 300;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      background: transparent;
+      border: 1px solid #2a4a6e;
+      border-radius: 6px;
+      padding: 5px;
+      transition: background 0.2s, left 0.28s ease;
+    }
+    #hamburger:hover { background: #162d52; }
+    #hamburger span {
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: #94a3b8;
+      border-radius: 2px;
+      transition: all 0.25s ease;
+    }
+    body.sidebar-hidden #hamburger {
+      left: 16px;
+      background: var(--sidebar-bg);
+      border-color: #1e3a5f;
+    }
+    body.sidebar-hidden #hamburger span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    body.sidebar-hidden #hamburger span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    body.sidebar-hidden #hamburger span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* ── SIDEBAR ── */
+    #sidebar {
+      position: fixed;
+      top: 0; left: 0;
+      width: var(--sidebar-w);
+      height: 100vh;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      z-index: 100;
+      transition: transform 0.28s ease;
+    }
+    body.sidebar-hidden #sidebar { transform: translateX(-100%); }
+    body.sidebar-hidden #main    { margin-left: 0; max-width: 100%; }
+
+    #sidebar-header {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid #1e3a5f;
+    }
+
+    #sidebar-header div:hover h1 { color: var(--accent); transition: color 0.2s; }
+    #sidebar-header div:hover p  { opacity: 0.8; transition: opacity 0.2s; }
+
+    #sidebar-header h1 {
+      font-family: var(--heading-font);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    #sidebar-header p {
+      font-size: 0.7rem;
+      color: var(--accent);
+      margin-top: 4px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+
+    #sidebar nav { padding: 12px 0; flex: 1; }
+
+    .nav-section-label {
+      font-family: var(--heading-font);
+      font-size: 0.6rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #4a6280;
+      padding: 14px 20px 6px;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 20px;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 400;
+      color: #94a3b8;
+      border-left: 3px solid transparent;
+      transition: all 0.18s ease;
+      text-decoration: none;
+    }
+
+    .nav-item:hover {
+      background: var(--sidebar-hover);
+      color: #e2e8f0;
+    }
+
+    .nav-item.active {
+      background: var(--sidebar-hover);
+      color: var(--accent);
+      border-left-color: var(--accent);
+      font-weight: 500;
+    }
+
+    .nav-item .nav-icon {
+      width: 16px;
+      height: 16px;
+      opacity: 0.7;
+      flex-shrink: 0;
+    }
+
+    .nav-item.active .nav-icon { opacity: 1; }
+
+    .nav-years {
+      font-size: 0.65rem;
+      color: #4a6280;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    /* ── MAIN CONTENT ── */
+    #main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      padding: 40px 48px 80px;
+      max-width: calc(100% - var(--sidebar-w));
+      height: 100vh;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      transition: margin-left 0.28s ease, max-width 0.28s ease;
+    }
+
+    /* Offset anchor so heading isn't hidden at the very top */
+    .section { scroll-margin-top: 24px; }
+
+    /* ── SECTION WRAPPER ── */
+    .section {
+      display: block;
+      margin-bottom: 60px;
+    }
+
+    /* ── SECTION HEADER ── */
+    .section-title {
+      font-family: var(--heading-font);
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text-dark);
+      margin-bottom: 6px;
+      letter-spacing: -0.01em;
+    }
+
+    .section-subtitle {
+      font-size: 0.82rem;
+      color: var(--text-mid);
+      margin-bottom: 28px;
+      font-weight: 400;
+    }
+
+    .section-divider {
+      width: 48px;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border-radius: 2px;
+      margin-bottom: 28px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 24px 28px;
+      margin-bottom: 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .card-title {
+      font-family: var(--heading-font);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-dark);
+      margin-bottom: 4px;
+    }
+
+    .card-meta {
+      font-size: 0.75rem;
+      color: var(--accent);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    /* ── SKILLS TABLE ── */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 10px 16px;
+      align-items: start;
+    }
+
+    .skill-label {
+      font-family: var(--heading-font);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--text-mid);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      padding-top: 3px;
+    }
+
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .tag {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 4px;
+      padding: 2px 9px;
+      font-size: 0.72rem;
+      font-weight: 500;
+    }
+
+    /* ── CERT / EDUCATION LIST ── */
+    .list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .list-item:last-child { border-bottom: none; }
+
+    .list-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .list-text {
+      font-size: 0.82rem;
+      color: var(--text-dark);
+      line-height: 1.55;
+    }
+
+    .list-year {
+      font-size: 0.68rem;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    /* ── EXPERIENCE ── */
+    .exp-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .exp-company {
+      font-family: var(--heading-font);
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-dark);
+    }
+
+    .exp-tenure {
+      font-size: 0.72rem;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .exp-role {
+      font-size: 0.8rem;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+
+    .exp-client {
+      font-size: 0.76rem;
+      color: var(--text-mid);
+      margin-bottom: 6px;
+      font-style: italic;
+    }
+
+    .exp-tech {
+      font-size: 0.73rem;
+      color: var(--text-mid);
+      margin-bottom: 16px;
+    }
+
+    .subsection-label {
+      font-family: var(--heading-font);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin: 16px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .subsection-label:first-of-type { margin-top: 0; }
+
+    .bullet-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .bullet-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      font-size: 0.82rem;
+      color: var(--text-dark);
+      line-height: 1.6;
+      margin-bottom: 7px;
+    }
+
+    .bullet-list li::before {
+      content: '';
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 7px;
+      flex-shrink: 0;
+    }
+
+    /* ── OVERVIEW DASHBOARD ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .stat-card {
+      background: var(--card-bg);
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      padding: 20px 22px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    .stat-number {
+      font-family: var(--heading-font);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .stat-label {
+      font-size: 0.74rem;
+      color: var(--text-mid);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .timeline-item {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 0;
+    }
+
+    .timeline-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 14px;
+      flex-shrink: 0;
+    }
+
+    .timeline-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent);
+      border: 2px solid var(--card-bg);
+      outline: 2px solid var(--accent);
+      flex-shrink: 0;
+      margin-top: 4px;
+    }
+
+    .timeline-line {
+      width: 2px;
+      flex: 1;
+      background: #e2e8f0;
+      margin-top: 4px;
+    }
+
+    .timeline-item:last-child .timeline-line { display: none; }
+
+    .timeline-body {
+      padding-bottom: 22px;
+      flex: 1;
+    }
+
+    .timeline-co {
+      font-family: var(--heading-font);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-dark);
+    }
+
+    .timeline-role {
+      font-size: 0.74rem;
+      color: var(--text-mid);
+      margin-top: 1px;
+    }
+
+    .timeline-period {
+      font-size: 0.68rem;
+      color: var(--accent);
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    /* scrollbar */
+    #sidebar::-webkit-scrollbar { width: 4px; }
+    #sidebar::-webkit-scrollbar-thumb { background: #2a4a6e; border-radius: 2px; }
+
+    /* ── RIGHT PANE BODY TEXT SIZE OVERRIDES ── */
+    #main .section-subtitle  { font-size: 1rem; }
+    #main .bullet-list li    { font-size: 1rem; }
+    #main .list-text         { font-size: 0.98rem; }
+    #main .list-year         { font-size: 0.85rem; }
+    #main .tag               { font-size: 0.85rem; padding: 3px 11px; }
+    #main .skill-label       { font-size: 0.85rem; }
+    #main .exp-role          { font-size: 0.95rem; }
+    #main .exp-client        { font-size: 0.9rem; }
+    #main .exp-tech          { font-size: 0.88rem; }
+    #main .exp-tenure        { font-size: 0.82rem; }
+    #main .subsection-label  { font-size: 0.85rem; }
+    #main .timeline-role     { font-size: 0.88rem; }
+    #main .timeline-period   { font-size: 0.82rem; }
+    #main .stat-label        { font-size: 0.85rem; }
+
+    /* ── CONTACT BUTTONS ── */
+    .contact-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: background 0.18s, border-color 0.18s;
+    }
+    .contact-btn:hover {
+      background: #dbeafe;
+      border-color: #93c5fd;
+    }
+    #main .contact-btn { font-size: 0.95rem; }
+
+    /* ── SIDEBAR BACKDROP (mobile overlay) ── */
+    #sidebar-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 99;
+    }
+
+    /* ── MOBILE STYLES ── */
+    @media (max-width: 768px) {
+      html { font-size: 16px; }
+
+      :root { --sidebar-w: 280px; }
+
+      /* Main takes full width regardless of sidebar state */
+      #main {
+        margin-left: 0 !important;
+        max-width: 100% !important;
+        padding: 20px 16px 80px;
+        height: 100vh;
+      }
+
+      /* Sidebar overlays content on mobile (no pushing) */
+      #sidebar { z-index: 200; }
+
+      /* Show backdrop when sidebar is open */
+      body:not(.sidebar-hidden) #sidebar-backdrop { display: block; }
+
+      /* Skills: single-column on mobile */
+      .skills-grid {
+        grid-template-columns: 1fr;
+        gap: 6px 0;
+      }
+
+      /* Cards get tighter padding */
+      .card { padding: 16px 18px; }
+
+      /* Keep stat cards in a 2-col grid on mobile */
+      .overview-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      /* Contact buttons — slightly smaller */
+      .contact-btn { font-size: 0.78rem; padding: 7px 12px; }
+      #main .contact-btn { font-size: 0.78rem; }
+
+      /* Reduce section title on small screens */
+      .section-title { font-size: 1.3rem; }
+    }
+
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════ HAMBURGER ═══════════════ -->
+<div id="hamburger" onclick="toggleSidebar()" title="Toggle navigation">
+  <span></span><span></span><span></span>
+</div>
+
+<!-- ═══════════════ SIDEBAR BACKDROP (mobile) ═══════════════ -->
+<div id="sidebar-backdrop" onclick="document.body.classList.add('sidebar-hidden')"></div>
+
+<!-- ═══════════════ SIDEBAR ═══════════════ -->
+<aside id="sidebar">
+  <div id="sidebar-header">
+    <div onclick="showSection('contact')" style="cursor:pointer;">
+      <h1>Arun Ramasamy</h1>
+      <p>Senior Infra &amp; Middleware Engineer</p>
+    </div>
+  </div>
+  <nav id="nav">
+    <div class="nav-section-label">Contact</div>
+    <a class="nav-item" data-section="contact" onclick="showSection('contact')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      Contact
+    </a>
+
+    <div class="nav-section-label">Overview</div>
+    <a class="nav-item" data-section="overview" onclick="showSection('overview')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      Career Overview
+    </a>
+
+    <div class="nav-section-label">Profile</div>
+    <a class="nav-item" data-section="skills" onclick="showSection('skills')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Technical Skills
+    </a>
+    <a class="nav-item" data-section="certs" onclick="showSection('certs')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+      Certifications
+    </a>
+    <a class="nav-item" data-section="education" onclick="showSection('education')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      Education
+    </a>
+
+    <div class="nav-section-label">Experience</div>
+    <a class="nav-item" data-section="fiserv" onclick="showSection('fiserv')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      Fiserv
+      <span class="nav-years">2021–Now</span>
+    </a>
+    <a class="nav-item" data-section="cog-us" onclick="showSection('cog-us')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+      Cognizant US
+      <span class="nav-years">2014–21</span>
+    </a>
+    <a class="nav-item" data-section="cog-in" onclick="showSection('cog-in')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+      Cognizant India
+      <span class="nav-years">2007–14</span>
+    </a>
+    <a class="nav-item" data-section="esquire" onclick="showSection('esquire')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Esquire Systems
+      <span class="nav-years">2006–07</span>
+    </a>
+    <a class="nav-item" data-section="vepl" onclick="showSection('vepl')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>
+      Valued Epistemics
+      <span class="nav-years">2005–06</span>
+    </a>
+    <a class="nav-item" data-section="iiht" onclick="showSection('iiht')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/></svg>
+      IIHT Adyar
+      <span class="nav-years">2005</span>
+    </a>
+    <a class="nav-item" data-section="sgs" onclick="showSection('sgs')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+      Sutherland
+      <span class="nav-years">2004</span>
+    </a>
+  </nav>
+</aside>
+
+<!-- ═══════════════ MAIN ═══════════════ -->
+<main id="main">
+
+  <!-- ── CONTACT ── -->
+  <section id="contact" class="section">
+    <h2 class="section-title">Contact</h2>
+    <p class="section-subtitle">Get in touch</p>
+    <div class="section-divider"></div>
+    <div class="card" style="display:flex;flex-wrap:wrap;gap:12px;">
+      <a href="mailto:arun.ramasamy@gmail.com" class="contact-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        arun.ramasamy@gmail.com
+      </a>
+      <a href="https://www.linkedin.com/in/arunramasamy1/" target="_blank" rel="noopener" class="contact-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+        linkedin.com/in/arunramasamy1
+      </a>
+      <a href="https://github.com/arunsamy1" target="_blank" rel="noopener" class="contact-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+        github.com/arunsamy1
+      </a>
+      <a href="https://www.credly.com/users/arun-ramasamy.803f385f/badges" target="_blank" rel="noopener" class="contact-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg>
+        Credly Badges
+      </a>
+    </div>
+  </section>
+
+  <!-- ── OVERVIEW ── -->
+  <section id="overview" class="section">
+    <h2 class="section-title">Career Overview</h2>
+    <p class="section-subtitle">Infrastructure &amp; Middleware Engineering — 20+ years of enterprise experience</p>
+    <div class="section-divider"></div>
+
+    <div class="overview-grid">
+      <div class="stat-card">
+        <div class="stat-number">20+</div>
+        <div class="stat-label">Years Experience</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">7</div>
+        <div class="stat-label">Employers / Roles</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">12</div>
+        <div class="stat-label">Certifications</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">800+</div>
+        <div class="stat-label">Servers Managed (WU)</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title" style="margin-bottom:18px;">Career Timeline</div>
+      <div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+        <div class="timeline-body">
+          <div class="timeline-co">Fiserv</div>
+          <div class="timeline-role">Systems Engineering Sr. Professional II</div>
+          <div class="timeline-period">June 2021 – Present</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+        <div class="timeline-body">
+          <div class="timeline-co">Cognizant Technology Solutions — US Corp</div>
+          <div class="timeline-role">Infra Architect</div>
+          <div class="timeline-period">Sep 2014 – June 2021</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+        <div class="timeline-body">
+          <div class="timeline-co">Cognizant Technology Solutions — India</div>
+          <div class="timeline-role">Technology Architect · Client: Western Union</div>
+          <div class="timeline-period">Nov 2007 – Sep 2014</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+        <div class="timeline-body">
+          <div class="timeline-co">Esquire Systems Pvt. Ltd.</div>
+          <div class="timeline-role">Infrastructure Analyst · Client: Standard Chartered Bank</div>
+          <div class="timeline-period">Sep 2006 – Nov 2007</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+        <div class="timeline-body">
+          <div class="timeline-co">Valued Epistemics Pvt. Ltd.</div>
+          <div class="timeline-role">Operation Engineer</div>
+          <div class="timeline-period">Nov 2005 – Sep 2006</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+        <div class="timeline-body">
+          <div class="timeline-co">IIHT Adyar</div>
+          <div class="timeline-role">Technical Coordinator</div>
+          <div class="timeline-period">Jan 2005 – Nov 2005</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-left"><div class="timeline-dot"></div><div class="timeline-line"></div></div>
+        <div class="timeline-body">
+          <div class="timeline-co">Sutherland Global Services Pvt. Ltd.</div>
+          <div class="timeline-role">Technical Support Executive</div>
+          <div class="timeline-period">Apr 2004 – Dec 2004</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TECHNICAL SKILLS ── -->
+  <section id="skills" class="section">
+    <h2 class="section-title">Technical Skills</h2>
+    <p class="section-subtitle">Core platforms, tools, and technologies across 20+ years of infrastructure work</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="skills-grid">
+        <div class="skill-label">Operating Systems</div>
+        <div class="skill-tags">
+          <span class="tag">Linux (RHEL)</span><span class="tag">OEL</span><span class="tag">SUSE</span><span class="tag">Ubuntu</span><span class="tag">Windows Server 2008/2012</span>
+        </div>
+
+        <div class="skill-label">Web Servers</div>
+        <div class="skill-tags">
+          <span class="tag">Apache 2.2/2.4</span><span class="tag">IBM HTTP Server 8.x/9.x</span>
+        </div>
+
+        <div class="skill-label">App Servers</div>
+        <div class="skill-tags">
+          <span class="tag">WebSphere 8.x/9.x</span><span class="tag">WebSphere Liberty</span><span class="tag">Wildfly</span><span class="tag">JBoss EAP</span><span class="tag">Tomcat</span><span class="tag">IIS</span>
+        </div>
+
+        <div class="skill-label">Cloud</div>
+        <div class="skill-tags">
+          <span class="tag">Microsoft Azure</span><span class="tag">AWS</span><span class="tag">Azure Red Hat OpenShift (ARO)</span>
+        </div>
+
+        <div class="skill-label">Automation</div>
+        <div class="skill-tags">
+          <span class="tag">Ansible</span><span class="tag">Rundeck</span><span class="tag">Terraform</span>
+        </div>
+
+        <div class="skill-label">Scripting</div>
+        <div class="skill-tags">
+          <span class="tag">Bash</span><span class="tag">Shell Script</span><span class="tag">Jython</span><span class="tag">ANT</span>
+        </div>
+
+        <div class="skill-label">Monitoring</div>
+        <div class="skill-tags">
+          <span class="tag">Splunk</span><span class="tag">AppDynamics</span>
+        </div>
+
+        <div class="skill-label">ITSM</div>
+        <div class="skill-tags">
+          <span class="tag">ServiceNow</span><span class="tag">Jira</span><span class="tag">ITIL v3</span>
+        </div>
+
+        <div class="skill-label">Documentation</div>
+        <div class="skill-tags">
+          <span class="tag">Markdown</span><span class="tag">Docusaurus</span>
+        </div>
+
+        <div class="skill-label">AI Tools</div>
+        <div class="skill-tags">
+          <span class="tag">Claude Code</span><span class="tag">OpenCode</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CERTIFICATIONS ── -->
+  <section id="certs" class="section">
+    <h2 class="section-title">Certifications</h2>
+    <p class="section-subtitle">Industry-recognised credentials spanning cloud, middleware, and infrastructure</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">DevOps Post Graduate Program</div>
+          <div class="list-year">Caltech CTME</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">HashiCorp Certified: Terraform Associate (HCTAO-002)</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">AWS Certified Cloud Practitioner</div>
+          <div class="list-year">Validation: P40MNF22PE111DGR</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">Microsoft Certified Azure Fundamentals</div>
+          <div class="list-year">Cert: H455-1375</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">IBM Certified System Administrator — WAS ND V8.5.5 &amp; Liberty Profile</div>
+          <div class="list-year">2017</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">ITIL 2011 Foundation Certified</div>
+          <div class="list-year">2014</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">IBM Certified System Administrator — WAS 8.0</div>
+          <div class="list-year">2013</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">IBM Certified Solution Architect — Cloud Computing Infrastructure V1</div>
+          <div class="list-year">2012</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">IBM Certified MQ Administrator</div>
+          <div class="list-year">2011</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">IBM Certified Advanced System Administrator — WAS NDM 6.1</div>
+          <div class="list-year">2009</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">Red Hat Certified Engineer (RHCE)</div>
+          <div class="list-year">Cert No. 804006529422104 · 2006</div>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text">Microsoft Certified Systems Engineer (MCSE — Windows 2000)</div>
+          <div class="list-year">2003</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── EDUCATION ── -->
+  <section id="education" class="section">
+    <h2 class="section-title">Education</h2>
+    <p class="section-subtitle">Academic foundation in engineering</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="list-item">
+        <div class="list-dot"></div>
+        <div>
+          <div class="list-text" style="font-weight:600;">Bachelor of Engineering</div>
+          <div class="list-year">Bharathidasan University, Trichy, India · June 2001</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FISERV ── -->
+  <section id="fiserv" class="section">
+    <h2 class="section-title">Fiserv</h2>
+    <p class="section-subtitle">Systems Engineering Sr. Professional II · June 2021 – Present</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="exp-header">
+        <div class="exp-company">Fiserv</div>
+        <span class="exp-tenure">June 2021 – Present</span>
+      </div>
+      <div class="exp-role">Systems Engineering Sr. Professional II</div>
+
+      <div class="subsection-label">Middleware Administration</div>
+      <ul class="bullet-list">
+        <li>Installed, hardened, and managed middleware servers: Apache, Tomcat, JBoss/Wildfly, WebSphere Traditional, WebSphere Liberty, WebLogic, and Microsoft IIS</li>
+        <li>Handled end-to-end patching management for IBM WebSphere Application Server, IBM HTTP Server, and Apache; coordinated middleware stop/start during OS and DB patching cycles</li>
+        <li>Led middleware automation project to standardize builds across Fiserv (OFD/OFS) using RunDeck; migrated existing scripts from SaltStack to Ansible</li>
+        <li>Participated in application load tests; collected and analyzed JVM must-gathers; engaged vendors for performance tuning</li>
+        <li>Performed BAU hand-offs and supported technology refresh projects</li>
+      </ul>
+
+      <div class="subsection-label">Certificate Management</div>
+      <ul class="bullet-list">
+        <li>Managed end-to-end SSL/TLS certificate lifecycle for WAS, IHS, WebLogic, Apache, Tomcat, JBoss, IIS, and RESTful services</li>
+        <li>Implemented certificate expiry monitoring in Venafi with automated alerts at 90-, 60-, 30-, and 15-day thresholds</li>
+        <li>Managed Root and Intermediate Certificate updates ensuring compliance across DataPower, LDAP, and middleware infrastructure</li>
+        <li>Oversaw certificate renewals for load balancers and WAF proxies</li>
+        <li>Handled certificate creation for new middleware and RESTful servers</li>
+      </ul>
+
+      <div class="subsection-label">Vulnerability Management</div>
+      <ul class="bullet-list">
+        <li>Remediated SSL/TLS non-compliance issues: SHA-1 to SHA-256 conversions, TLSv1.x protocol upgrades, and cipher hardening</li>
+        <li>Resolved vulnerabilities identified through Wiz, Fortify, and security scans in collaboration with application teams</li>
+        <li>Managed Java upgrades for OpenJDK and open-source middleware components</li>
+      </ul>
+
+      <div class="subsection-label">Cloud &amp; OpenShift (ARO)</div>
+      <ul class="bullet-list">
+        <li>Provisioned Azure Red Hat OpenShift (ARO) clusters on-demand using Terraform and GitLab</li>
+        <li>Administered ARO and on-premises OpenShift clusters; performed monthly upgrades aligned with OpenShift release schedules</li>
+        <li>Configured firewall rules, network policies, and access provisioning for onboarding applications to ARO/on-prem across QA/DEV and CAT/PROD environments</li>
+        <li>Deployed all applications in ARO/on-prem; collaborated directly with Microsoft for ARO support escalations</li>
+      </ul>
+
+      <div class="subsection-label">BAU &amp; Operations</div>
+      <ul class="bullet-list">
+        <li>On-call support: monitored applications, triaged IRs, and provided root cause analysis for middleware-related P1 issues</li>
+        <li>Supported AppDev requests: middleware recycles, file operations, property updates, JMS/JDBC resource creation, and run book maintenance</li>
+        <li>Submitted firewall requests for new builds and endpoint connectivity; verified open status post-completion</li>
+        <li>Onboarded new clients onto REST using the admin tool in collaboration with the MQ team</li>
+        <li>Handled decommission requests for middleware servers</li>
+        <li>Managed new builds and configuration deployments for PCF, OpenShift, and middleware products via ServiceNow and Jira</li>
+        <li>Created change records and ensured all approvals (peer review, CAB) were followed through</li>
+      </ul>
+
+      <div class="subsection-label">Incident &amp; Problem Management</div>
+      <ul class="bullet-list">
+        <li>Served as Enabled Incident Manager for P3 incidents on a 12-hour rotation: promoted incidents, engaged cross-team bridges, tracked activities, and drove resolution</li>
+        <li>Joined incident calls for middleware applications; supported stop/start of services and issue analysis</li>
+        <li>Resolved problem records by identifying root cause, documenting RCA, and defining preventive action items</li>
+        <li>Performed peak season monitoring at year-end using eyes-on-glass dashboards and daily health check reports</li>
+        <li>Led annual Disaster Recovery exercises: coordinated service stop/start and traffic failover for all supported applications</li>
+      </ul>
+
+      <div class="subsection-label">Application Support</div>
+      <ul class="bullet-list">
+        <li>L1 middleware support for apps under Rajat: RESTFUL, PUBSUB, PROXY, iLOCC, SHIPP, FIWS NGN, FIWS Silver</li>
+        <li>L1 middleware support for apps under Jay: Solution Builder, NRE, CRE, Spend Trend, eMessenger, ESS, CX Collections, Ease, DDP-BSL, Evolve, SPM, HealthCare, Rules</li>
+        <li>L1 middleware support for apps under Chas: eCS 2.0, 3.0, and Open Loop</li>
+        <li>Output Solutions middleware support: ROWNET, ROWNET PSCU, SYF ONDEMAND, QAOTI DEMAND, CMDO DOCUMENT RETRIEVAL SERVICE, AFP GUI, ROWNET2, iConvert</li>
+        <li>BAU middleware support for Technology Services / CORP Apps</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── COGNIZANT US ── -->
+  <section id="cog-us" class="section">
+    <h2 class="section-title">Cognizant — US Corp</h2>
+    <p class="section-subtitle">Infra Architect · Sep 2014 – June 2021</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="exp-header">
+        <div class="exp-company">Cognizant Technology Solutions — US Corp</div>
+        <span class="exp-tenure">Sep 2014 – June 2021</span>
+      </div>
+      <div class="exp-role">Infra Architect</div>
+
+      <div class="subsection-label">Security Vulnerability Remediation</div>
+      <ul class="bullet-list">
+        <li>Analyzed and resolved security vulnerabilities across Apache, WebSphere, and Wildfly, implementing patches and configurations as necessary</li>
+        <li>Remediated major vulnerabilities: SSLv3 POODLE, Heartbleed, and FREAK across Apache, IBM WebSphere, IBM HTTP Server, and Wildfly servers</li>
+        <li>Led migration to TLS 1.2 protocol across Apache, WebSphere, JBoss, and Wildfly servers</li>
+        <li>Supported PenTest and AppScan remediation, coordinating schedules, work orders, and implementation across application teams</li>
+        <li>Delivered Apache server hardening and security incident isolation</li>
+      </ul>
+
+      <div class="subsection-label">Middleware Patching &amp; Upgrades</div>
+      <ul class="bullet-list">
+        <li>Automated patching process for middleware servers using shell scripts and Opsware, reducing downtime and streamlining maintenance</li>
+        <li>Handled patching of Apache, IBM WebSphere, IBM HTTP Server, JBoss/Wildfly, Tomcat, and WebLogic</li>
+        <li>Managed upgrades and patching of non-standard, custom-built middleware servers</li>
+        <li>Developed Apache upgrade and installation automation scripts using Bash and Opsware</li>
+        <li>Automated fixpack installation and upgrade processes for Apache and WebSphere</li>
+      </ul>
+
+      <div class="subsection-label">Automation &amp; Scripting</div>
+      <ul class="bullet-list">
+        <li>Provided IBM WebSphere migration assistance using Jython and Bash scripting</li>
+        <li>Performed recovery of IBM Installation Manager and IBM products corrupted by non-standard installations</li>
+      </ul>
+
+      <div class="subsection-label">Application Build &amp; Migration</div>
+      <ul class="bullet-list">
+        <li>Designed and built enterprise applications: Rule Manager, Falcon, Dispute Expert, Apigee, STAR, OpenLoop, and ClosedLoop, managing their migration and upgrades</li>
+        <li>Built Dispute Expert application on JBoss EAP 7.2</li>
+        <li>Spearheaded STAR application migration to new Dell hardware with capacity planning (stack: Apache and Wildfly)</li>
+        <li>Managed production support for STAR, OpenLoop, ClosedLoop, and Dispute Expert on a rotating shift basis; handled production changes and incident management</li>
+      </ul>
+
+      <div class="subsection-label">COE / Process &amp; Knowledge Management</div>
+      <ul class="bullet-list">
+        <li>Implemented middleware administration best practices across multiple client engagements, ensuring audit compliance and process adherence</li>
+        <li>Conducted engagement audits for compliance with Cognizant's C2O standards</li>
+        <li>Led Proof of Concept (POC) initiatives for IBM Middleware, Oracle, and Red Hat JBoss migrations</li>
+        <li>Prepared and responded to RFPs and RFIs supporting new business development</li>
+        <li>Delivered training sessions on Apache, Tomcat, and middleware technologies; maintained knowledge repositories</li>
+        <li>Led Continuous Service Improvement (CSI) initiatives including SIPs and BizEx projects</li>
+        <li>Supported the Team Connect application upgrade for the MASS Mutual project</li>
+        <li>Provided strategic support for the AMEX Explore project: WebSphere Portal upgrades and resource optimization</li>
+        <li>Delivered presentations on middleware best practices at IT IS Learning Mela</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── COGNIZANT INDIA ── -->
+  <section id="cog-in" class="section">
+    <h2 class="section-title">Cognizant — India</h2>
+    <p class="section-subtitle">Technology Architect · Nov 2007 – Sep 2014 · Client: Western Union Money Transfer</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="exp-header">
+        <div class="exp-company">Cognizant Technology Solutions — India</div>
+        <span class="exp-tenure">Nov 2007 – Sep 2014</span>
+      </div>
+      <div class="exp-role">Technology Architect</div>
+      <div class="exp-client">Client: Western Union Money Transfer</div>
+
+      <ul class="bullet-list">
+        <li>Installed, configured, and administered WebSphere Application Server (WAS), Network Deployment Manager, and web servers for WU.COM, including applying WebSphere patches</li>
+        <li>Set up runtime environments for J2EE web applications based on developer requirements</li>
+        <li>Led migration of application server environments from WebSphere 5.1 to 7.0 across 70+ J2EE/.NET applications</li>
+        <li>Administered Western Union's internet/intranet web applications running on WebSphere, IIS, and Apache across approximately 800 servers</li>
+        <li>Developed and implemented log archival scripts for IIS and application servers</li>
+        <li>Supported data center migrations including traffic failover between data centers via load balancer coordination</li>
+        <li>Provided deployment support for JBoss, Jetty, Message Broker, MQ, IBM Portal Server, and IBM DataPower Systems</li>
+        <li>Troubleshot production incidents; provided on-call support during weekends</li>
+        <li>Collaborated with development and testing teams to resolve issues in QA and UAT environments, minimizing downtime</li>
+        <li>Led efforts in automating repetitive tasks and optimizing support processes</li>
+        <li>Trained new team members in middleware technologies; maintained support documentation</li>
+        <li>Led and mentored a team of 8 middleware administrators; managed task assignments, shift planning, and ticket management</li>
+        <li>Served as BCP Lead; played a key role in achieving ISO 9001 certification for the team</li>
+        <li>Created and maintained a Known Error Database to improve troubleshooting efficiency</li>
+        <li>Regularly reported team performance and process improvements to management stakeholders</li>
+        <li>Awarded the <strong>Pinnacle Award (December 2010)</strong> for best team performance in IT Infrastructure Services</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── ESQUIRE ── -->
+  <section id="esquire" class="section">
+    <h2 class="section-title">Esquire Systems Pvt. Ltd.</h2>
+    <p class="section-subtitle">Infrastructure Analyst · Sep 2006 – Nov 2007 · Client: Standard Chartered Bank</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="exp-header">
+        <div class="exp-company">Esquire Systems Pvt. Ltd.</div>
+        <span class="exp-tenure">Sep 2006 – Nov 2007</span>
+      </div>
+      <div class="exp-role">Infrastructure Analyst</div>
+      <div class="exp-client">Client: Scope International (Standard Chartered Bank)</div>
+      <div class="exp-tech">Stack: Red Hat Linux 4.3 · IBM WebSphere 5.1.1.8 Base · OpenLDAP 2.2 · DB2 Express 8.1</div>
+
+      <ul class="bullet-list">
+        <li>Provided end-to-end infrastructure support for eBBS, a core banking J2EE application on IBM IHS, WebSphere Application Server (WAS), DB2, and LDAP</li>
+        <li>Supported eBBS across Dev, ST, SIT, UAT, and production environments — from environment setup through the completion of testing cycles</li>
+        <li>Automated daily WebSphere configuration backups, ensuring system reliability</li>
+        <li>Completed the rollout of 6 offline branch servers in Nigeria for SCB's eBBS deployment; also supported a similar deployment in Dubai</li>
+        <li>Managed environment support including installation and patching of IBM HTTP Server and WebSphere Application Server</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── VALUED EPISTEMICS ── -->
+  <section id="vepl" class="section">
+    <h2 class="section-title">Valued Epistemics Pvt. Ltd.</h2>
+    <p class="section-subtitle">Operation Engineer · Nov 2005 – Sep 2006</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="exp-header">
+        <div class="exp-company">Valued Epistemics Pvt. Ltd.</div>
+        <span class="exp-tenure">Nov 2005 – Sep 2006</span>
+      </div>
+      <div class="exp-role">Operation Engineer</div>
+      <div class="exp-tech">Stack: CentOS 4 · JBoss · Apache · MySQL</div>
+
+      <ul class="bullet-list">
+        <li>Performed daily activities: regular backups, server/firewall log monitoring, user account management, internet connectivity, and desktop support</li>
+        <li>Administered a network of 30 computers including 4 Linux servers and a Windows Active Directory Server; managed the intranet website (Apache, PHP) with web calendar, forum, blog, wiki, and Jabber chat server</li>
+        <li>Configured a Linux file server using Samba and automated MySQL database backups via BASH scripts</li>
+        <li>Administered the wizdom.in website and mail server using Apache, Sendmail, and Dovecot; managed DNS through DynDNS</li>
+        <li>Set up a VSFTPD server for FTP access for content creators to upload files</li>
+        <li>Configured NAT and firewall for server security and access control</li>
+        <li>Designed and managed the Wizdom runtime environment (J2ME) for scalable performance using Apache, JBoss, and Apache Reverse Proxy with multi-ISP failover via DynDNS</li>
+        <li>Installed and configured Apache Tomcat, JBoss, and MySQL servers on CentOS Linux, connecting them to the internet for production and development environments</li>
+        <li>Established a development and integration environment; achieved <strong>96 days of uninterrupted system uptime</strong> before departure</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── IIHT ── -->
+  <section id="iiht" class="section">
+    <h2 class="section-title">IIHT Adyar</h2>
+    <p class="section-subtitle">Technical Coordinator · Jan 2005 – Nov 2005</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="exp-header">
+        <div class="exp-company">IIHT Adyar</div>
+        <span class="exp-tenure">Jan 2005 – Nov 2005</span>
+      </div>
+      <div class="exp-role">Technical Coordinator</div>
+      <div class="exp-tech">Stack: RHEL 3 · Windows 2000 · Windows Server 2003 · Apache · BIND</div>
+
+      <ul class="bullet-list">
+        <li>Delivered technical training for MCSE (Windows Server 2003), RHCE (RHEL 3.0), and CCNA certification courses</li>
+        <li>Provided technical consultation to clients on LAN maintenance and network optimization</li>
+        <li>Managed a network of 30 computers, ensuring smooth operation of internet connection sharing and file server systems</li>
+        <li>Conducted maintenance and troubleshooting for system and network infrastructure, ensuring minimal downtime and operational efficiency</li>
+        <li>Maintained self-directed study practice to stay current on emerging technologies and provide guidance on practical applications</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ── SUTHERLAND ── -->
+  <section id="sgs" class="section">
+    <h2 class="section-title">Sutherland Global Services</h2>
+    <p class="section-subtitle">Technical Support Executive · Apr 2004 – Dec 2004</p>
+    <div class="section-divider"></div>
+
+    <div class="card">
+      <div class="exp-header">
+        <div class="exp-company">Sutherland Global Services Pvt. Ltd.</div>
+        <span class="exp-tenure">Apr 2004 – Dec 2004</span>
+      </div>
+      <div class="exp-role">Technical Support Executive</div>
+      <div class="exp-tech">Stack: Windows XP · HP and Compaq desktops and laptops</div>
+
+      <ul class="bullet-list">
+        <li>Provided technical voice support for HP and Compaq desktop and laptop users, resolving hardware, Windows OS, and software-related issues</li>
+        <li>Gained extensive experience troubleshooting and resolving desktop hardware and OS issues efficiently within a short period</li>
+        <li>Developed strong remote troubleshooting skills across a wide range of technical challenges</li>
+        <li>Delivered effective customer support while handling diverse technical problems</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+
+<script>
+  // On mobile, start with the sidebar hidden (overlay mode)
+  if (window.innerWidth <= 768) {
+    document.body.classList.add('sidebar-hidden');
+  }
+
+  function toggleSidebar() {
+    document.body.classList.toggle('sidebar-hidden');
+  }
+
+  function showSection(id) {
+    // On mobile, close the sidebar after tapping a nav link
+    if (window.innerWidth <= 768) {
+      document.body.classList.add('sidebar-hidden');
+    }
+    const target = document.getElementById(id);
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }
+
+  // Scrollspy: highlight nav item whose section is nearest the top
+  const sections = document.querySelectorAll('.section');
+  const navItems = document.querySelectorAll('.nav-item[data-section]');
+
+  function onScroll() {
+    let current = sections[0].id;
+    sections.forEach(sec => {
+      if (sec.getBoundingClientRect().top <= 80) {
+        current = sec.id;
+      }
+    });
+    navItems.forEach(n => {
+      n.classList.toggle('active', n.dataset.section === current);
+    });
+  }
+
+  // Use the main content area for scroll events
+  const mainEl = document.getElementById('main');
+  mainEl.addEventListener('scroll', onScroll, { passive: true });
+  // Also listen on window in case the page itself scrolls
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+</script>
+</body>
+</html>
